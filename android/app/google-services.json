@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "938170352569",
+    "project_id": "fmandi-a7e9b",
+    "storage_bucket": "fmandi-a7e9b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938170352569:android:b2c2756e828fdffc6fec68",
+        "android_client_info": {
+          "package_name": "com.example.emandi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgumsZt7jD-KGAaE_ahV1mCK4y8BFaE-E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
