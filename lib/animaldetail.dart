@@ -1,9 +1,14 @@
+import 'dart:convert';
+
+import 'package:emandi/forgotpass.dart';
 import 'package:emandi/model.dart';
 import 'package:emandi/splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 class animalDetail extends StatefulWidget {
   Data temp;
@@ -13,6 +18,8 @@ class animalDetail extends StatefulWidget {
 }
 
 class _animalDetailState extends State<animalDetail> {
+  Map<String, dynamic>? paymentIntentData;
+
   var _detail = Data(
       email: 'asif@gmail.com',
       image: 'assets/images/cow.png',
@@ -45,6 +52,7 @@ class _animalDetailState extends State<animalDetail> {
     'Gujrat',
   ];
   late Uri whatsapp;
+
   void logout() async {
     await FirebaseAuth.instance.signOut();
     Navigator.popUntil(context, (route) => route.isFirst);
@@ -77,237 +85,6 @@ class _animalDetailState extends State<animalDetail> {
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
-          actions: <Widget>[
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.search, color: Colors.white),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.read_more,
-                    size: 28,
-                    // color: Colors.white,
-                  ),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) => SingleChildScrollView(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 16.0, top: 16.0, bottom: 69),
-                                      child: Text(
-                                        'Filter',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 216.0, top: 16.0, bottom: 69),
-                                      child: TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close the bottom sheet
-                                        },
-                                        child: Text(
-                                          'Close',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 22.0, bottom: 6),
-                                    child: Text(
-                                      'Select Category',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 18.0, right: 18),
-                                child: DropdownButtonFormField(
-                                  value: _selectedCategory,
-                                  items: _categories.map((String category) {
-                                    return DropdownMenuItem(
-                                      value: category,
-                                      child: Text(category),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCategory = value;
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Select Category',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.pink,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.teal,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.black54,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical: 16,
-                                      horizontal: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 22.0, bottom: 6, top: 8),
-                                    child: Text(
-                                      'Select Area',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 18.0, right: 18),
-                                child: DropdownButtonFormField(
-                                  value: _selectedArea,
-                                  items: _area.map((String category) {
-                                    return DropdownMenuItem(
-                                      value: category,
-                                      child: Text(category),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedArea = value;
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Select Area',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.pink,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.teal,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.black54,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical: 16,
-                                      horizontal: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 12.0, left: 22, bottom: 8),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    'Max Price(PKR)',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 18.0,
-                                  right: 18,
-                                ),
-                                child: TextField(
-                                  keyboardType: TextInputType.text,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter Price',
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11),
-                                        borderSide: BorderSide(
-                                            color: Colors.pink, width: 3)),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11),
-                                        borderSide: BorderSide(
-                                            color: Colors.teal, width: 3)),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11),
-                                        borderSide: BorderSide(
-                                            color: Colors.black54, width: 3)),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 12.0, left: 22, bottom: 18),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    'Select Age',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                )
-              ],
-            )
-          ],
           backgroundColor: Colors.teal,
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
@@ -433,18 +210,8 @@ class _animalDetailState extends State<animalDetail> {
                   padding:
                       const EdgeInsets.only(top: 13.0, left: 13, right: 10),
                   child: ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Center(
-                              child: Container(
-                                width: 340,
-                                // height: 10,
-                                child: Image.asset('assets/images/zamant.png'),
-                              ),
-                            );
-                          });
+                    onPressed: () async {
+                      await makePayment();
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red.shade200,
@@ -658,5 +425,136 @@ class _animalDetailState extends State<animalDetail> {
             ),
           ),
         ));
+  }
+
+//
+//   Future<void> makePayment() async {
+//     try {
+//       paymentIntentData = await createPaymentIntent("20", 'USD');
+//       await Stripe.instance.initPaymentSheet(
+//           paymentSheetParameters: SetupPaymentSheetParameters(
+//               paymentIntentClientSecret: paymentIntentData!['client_secret'],
+//               // style: ThemeMode.dark,
+//               googlePay: PaymentSheetGooglePay(merchantCountryCode: 'US'),
+//               merchantDisplayName: 'Fahad'));
+//       displayPaymentSheet();
+//     } catch (e) {
+//       print('exception' + e.toString());
+//     }
+//   }
+//
+//   displayPaymentSheet() async {
+//     try {
+//       await Stripe.instance.presentPaymentSheet().then((value) {
+//         setState(() {
+//           paymentIntentData = null;
+//         });
+//       });
+//
+//       MyToast.myShowToast('Paid Successfully');
+//     } on StripeException catch (e) {
+//       print(e.toString());
+//       showDialog(
+//           context: context,
+//           builder: (_) => AlertDialog(
+//                 content: Text('Cancelled'),
+//               ));
+//     }
+//   }
+//
+//   createPaymentIntent(String amount, String currency) async {
+//     try {
+//       Map<String, dynamic> body = {
+//         'amount': calculateAmount(amount),
+//         'currency': currency,
+//         'payment_method_types[]': 'card'
+//       };
+//
+//       var response = await http.post(
+//         Uri.parse('http://api.stripe.com/v1/payment_intents'),
+//         body: body,
+//         headers: {
+//           'Authorization':
+//               'Bearer sk_test_51PHi05Rvwlv5GWNu60409WwLGu5PTpfEMHr5SSEXnw2ZeWIKfyilRLHTdXAvJtt0EQFNGyJCi840qKPUG4UbVwEh00oV38wlxa',
+//           'Content-Type': 'application/x-www-form-urlencoded'
+//         },
+//       );
+//       return jsonDecode(response.body.toString());
+//     } catch (e) {
+//       print('exception' + e.toString());
+//     }
+//   }
+//
+//   calculateAmount(String amount) {
+//     final price = int.parse(amount) * 100;
+//     return price.toString();
+//   }
+// }
+  Future<void> makePayment() async {
+    try {
+      paymentIntentData = await createPaymentIntent(_detail.Rs, "USD");
+      if (paymentIntentData != null &&
+          paymentIntentData!['client_secret'] != null) {
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: paymentIntentData!['client_secret'],
+            googlePay: const PaymentSheetGooglePay(
+              merchantCountryCode: 'US',
+            ),
+            merchantDisplayName: 'CaterLink',
+          ),
+        );
+
+        displayPaymentSheet();
+      } else {
+        print("Failed to create payment intent");
+      }
+    } catch (e) {
+      print("exception: $e");
+    }
+  }
+
+  Future<void> displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) {
+        setState(() {
+          paymentIntentData = null;
+        });
+      });
+    } catch (e) {
+      print("exception: $e");
+    }
+  }
+
+  Future<Map<String, dynamic>?> createPaymentIntent(
+      String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': calculateAmount(amount),
+        'currency': currency,
+        'payment_method_types[]': 'card',
+      };
+
+      var response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        body: body,
+        headers: {
+          'Authorization':
+              'Bearer sk_test_51PHi05Rvwlv5GWNu60409WwLGu5PTpfEMHr5SSEXnw2ZeWIKfyilRLHTdXAvJtt0EQFNGyJCi840qKPUG4UbVwEh00oV38wlxa',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      print("exception: $e");
+      return null;
+    }
+  }
+
+  String calculateAmount(String amount) {
+    String amountWithoutCommas = amount.replaceAll(',', '');
+    final price = int.parse(amountWithoutCommas) * 100;
+    return price.toString();
   }
 }

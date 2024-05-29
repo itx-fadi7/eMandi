@@ -2,6 +2,7 @@ import 'package:emandi/model.dart';
 import 'package:emandi/splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class sellerDetailPage extends StatefulWidget {
@@ -77,237 +78,6 @@ class _sellerDetailPageState extends State<sellerDetailPage> {
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
-          actions: <Widget>[
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.search, color: Colors.white),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.read_more,
-                    size: 28,
-                    // color: Colors.white,
-                  ),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) => SingleChildScrollView(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 16.0, top: 16.0, bottom: 69),
-                                      child: Text(
-                                        'Filter',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 216.0, top: 16.0, bottom: 69),
-                                      child: TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close the bottom sheet
-                                        },
-                                        child: Text(
-                                          'Close',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 22.0, bottom: 6),
-                                    child: Text(
-                                      'Select Category',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 18.0, right: 18),
-                                child: DropdownButtonFormField(
-                                  value: _selectedCategory,
-                                  items: _categories.map((String category) {
-                                    return DropdownMenuItem(
-                                      value: category,
-                                      child: Text(category),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCategory = value;
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Select Category',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.pink,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.teal,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.black54,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical: 16,
-                                      horizontal: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 22.0, bottom: 6, top: 8),
-                                    child: Text(
-                                      'Select Area',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 18.0, right: 18),
-                                child: DropdownButtonFormField(
-                                  value: _selectedArea,
-                                  items: _area.map((String category) {
-                                    return DropdownMenuItem(
-                                      value: category,
-                                      child: Text(category),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedArea = value;
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Select Area',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.pink,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.teal,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(11),
-                                      borderSide: BorderSide(
-                                        color: Colors.black54,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical: 16,
-                                      horizontal: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 12.0, left: 22, bottom: 8),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    'Max Price(PKR)',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 18.0,
-                                  right: 18,
-                                ),
-                                child: TextField(
-                                  keyboardType: TextInputType.text,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter Price',
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11),
-                                        borderSide: BorderSide(
-                                            color: Colors.pink, width: 3)),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11),
-                                        borderSide: BorderSide(
-                                            color: Colors.teal, width: 3)),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11),
-                                        borderSide: BorderSide(
-                                            color: Colors.black54, width: 3)),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 12.0, left: 22, bottom: 18),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    'Select Age',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                )
-              ],
-            )
-          ],
           backgroundColor: Colors.teal,
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
@@ -562,6 +332,49 @@ class _sellerDetailPageState extends State<sellerDetailPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(_detail.description),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0, top: 10),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        "assets/images/star.svg",
+                        height: 17,
+                        width: 17,
+                        color: Colors.orange,
+                      ),
+                      // Icon(
+                      //   Icons.star_border_outlined,
+                      //   color: Colors.orange,
+                      //   size: 18,
+                      // ),
+                      Text(
+                        "  Reviews",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 17),
+                      ),
+                      Text(
+                        " (7 Reviews)",
+                        style: TextStyle(
+                          fontFamily: "Manrope",
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 30.0,
+                  ),
+                  child: Text(
+                    "4.67 Stars",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                        color: Colors.orange),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, left: 8),

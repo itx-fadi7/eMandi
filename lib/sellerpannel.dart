@@ -19,7 +19,6 @@ import 'package:intl/intl.dart';
 
 class seller extends StatefulWidget {
   String email = '';
-
   String flag;
   String dummy_image = '';
   String dummy_title = '';
@@ -56,6 +55,7 @@ class seller extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<seller> {
+  String _selectedUnit = 'years';
   DateTime now = DateTime.now();
   String formattedDate = '';
   imagePickerController controller = Get.put(imagePickerController());
@@ -83,10 +83,11 @@ class _MyHomePageState extends State<seller> {
     );
   }
 
+  bool _categoryError = false;
   bool _locationError = false;
   bool _priceError = false;
   bool _keywordsError = false;
-  bool _categoryError = false;
+
   bool _quantityError = false;
   bool _ageError = false;
   bool _descriptionError = false;
@@ -127,7 +128,7 @@ class _MyHomePageState extends State<seller> {
         "Keywords": keyword,
         "category": category,
         "quantity": quantity,
-        "age": age,
+        "age": age + _selectedUnit,
         "description": description,
         "OwnerName": ownerName,
         "OwnerPho": pho,
@@ -188,6 +189,7 @@ class _MyHomePageState extends State<seller> {
     // setState(() {
     //   ;
     // });
+    print(widget.email);
     setState(() {
       _title.text = widget.dummy_title;
       _price.text = widget.dummy_price;
@@ -553,26 +555,20 @@ class _MyHomePageState extends State<seller> {
                   decoration: InputDecoration(
                     hintText: 'Select Area',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                        color: Colors.pink,
-                        width: 3,
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(11),
+                        borderSide: BorderSide(
+                            color: _locationError ? Colors.red : Colors.green,
+                            width: 3)),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                        color: Colors.teal,
-                        width: 3,
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(11),
+                        borderSide: BorderSide(
+                            color: _locationError ? Colors.red : Colors.teal,
+                            width: 3)),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                        color: Colors.black54,
-                        width: 3,
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(11),
+                        borderSide: BorderSide(
+                            color: _locationError ? Colors.red : Colors.grey,
+                            width: 3)),
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 16,
                       horizontal: 16,
@@ -648,26 +644,20 @@ class _MyHomePageState extends State<seller> {
                   decoration: InputDecoration(
                     hintText: 'Select Category',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                        color: Colors.pink,
-                        width: 3,
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(11),
+                        borderSide: BorderSide(
+                            color: _categoryError ? Colors.red : Colors.green,
+                            width: 3)),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                        color: Colors.teal,
-                        width: 3,
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(11),
+                        borderSide: BorderSide(
+                            color: _categoryError ? Colors.red : Colors.teal,
+                            width: 3)),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11),
-                      borderSide: BorderSide(
-                        color: Colors.black54,
-                        width: 3,
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(11),
+                        borderSide: BorderSide(
+                            color: _categoryError ? Colors.red : Colors.grey,
+                            width: 3)),
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 16,
                       horizontal: 16,
@@ -705,28 +695,67 @@ class _MyHomePageState extends State<seller> {
               Container(height: 18),
               Padding(
                 padding: const EdgeInsets.only(left: 18.0, right: 27),
-                child: TextField(
-                  // keyboardType: TextInputType.phone,
-                  controller: _age,
-                  decoration: InputDecoration(
-                    labelText: 'Enter Animal Age',
-                    labelStyle: TextStyle(color: Colors.black),
-                    border: OutlineInputBorder(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        // keyboardType: TextInputType.phone,
+                        controller: _age,
+                        decoration: InputDecoration(
+                          labelText: 'Enter Animal Age',
+                          labelStyle: TextStyle(color: Colors.black),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(11),
+                              borderSide: BorderSide(
+                                  color: _ageError ? Colors.red : Colors.green,
+                                  width: 3)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(11),
+                              borderSide: BorderSide(
+                                  color: _ageError ? Colors.red : Colors.teal,
+                                  width: 3)),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(11),
+                              borderSide: BorderSide(
+                                  color: _ageError ? Colors.red : Colors.grey,
+                                  width: 3)),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(11),
-                        borderSide: BorderSide(
-                            color: _ageError ? Colors.red : Colors.green,
-                            width: 3)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(11),
-                        borderSide: BorderSide(
-                            color: _ageError ? Colors.red : Colors.teal,
-                            width: 3)),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(11),
-                        borderSide: BorderSide(
-                            color: _ageError ? Colors.red : Colors.grey,
-                            width: 3)),
-                  ),
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 3,
+                        ),
+                      ),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          unselectedWidgetColor: Colors
+                              .grey, // Set the color to grey when not focused
+                        ),
+                        child: DropdownButton<String>(
+                          value: _selectedUnit,
+                          items: <String>['years', 'months', 'days']
+                              .map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedUnit = newValue.toString();
+                            });
+                          },
+                          underline: SizedBox(), // Remove the default underline
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Container(height: 18),
@@ -737,7 +766,6 @@ class _MyHomePageState extends State<seller> {
                   decoration: InputDecoration(
                     labelText: 'Enter Description',
                     labelStyle: TextStyle(color: Colors.black),
-                    // hintText: ,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(11),
                         borderSide: BorderSide(color: Colors.green, width: 3)),
@@ -882,7 +910,7 @@ class _MyHomePageState extends State<seller> {
                           key: _keywords.text,
                           category: _category,
                           animalQuantity: _quantity.text,
-                          age: _age.text,
+                          age: _age.text + _selectedUnit,
                           description: _description.text,
                           ownerName: _ownerName.text,
                           ownerPho: _ownerPho.text,

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'model.dart';
+
 class bottomSheet extends StatefulWidget {
-  const bottomSheet({super.key});
+  List<Data> data = [];
+  bottomSheet({super.key, required this.data});
 
   @override
   State<bottomSheet> createState() => _bottomSheetState();
@@ -23,8 +26,48 @@ class _bottomSheetState extends State<bottomSheet> {
     'Lalamusa',
     'Gujrat',
   ];
+  double startAge = 0.00;
+  double endAge = 10.00;
   RangeValues values = RangeValues(0, 10);
+
+  TextEditingController selectedRs = new TextEditingController();
+  List<Data> filterListBySearch(
+    List<Data>? originalList,
+    double startage,
+    double endage,
+    String? selectarea,
+    String? selectcategory,
+    String? selectedrs,
+  ) {
+    if (originalList == null) {
+      return []; // Return an empty list if originalList is null
+    }
+    print(selectedrs);
+    print(selectedrs.runtimeType);
+    print(selectarea);
+    return originalList
+        .where((data) =>
+            data.location == selectarea &&
+            data.category == selectcategory &&
+            int.tryParse(data.Rs!)! <= int.tryParse(selectedrs!)! &&
+            double.tryParse(data.age!
+                    .replaceFirst('years', '')!
+                    .replaceFirst('months', '')!
+                    .replaceFirst('days', '')!)! >=
+                startage! &&
+            double.tryParse(data.age!
+                    .replaceFirst('years', '')!
+                    .replaceFirst('months', '')!
+                    .replaceFirst('days', '')!)! <=
+                endage)
+        .toList();
+  }
+
   @override
+  void initState() {
+    print(widget.data);
+  }
+
   Widget build(BuildContext context) {
     RangeLabels labels =
         RangeLabels(values.start.toString(), values.end.toString());
@@ -194,7 +237,8 @@ class _bottomSheetState extends State<bottomSheet> {
                 right: 18,
               ),
               child: TextField(
-                keyboardType: TextInputType.text,
+                controller: selectedRs,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   hintText: 'Enter Price',
                   border: OutlineInputBorder(
@@ -234,7 +278,10 @@ class _bottomSheetState extends State<bottomSheet> {
                   max: 10,
                   onChanged: (newValues) {
                     values = newValues;
-                    setState(() {});
+                    setState(() {
+                      startAge = newValues.start;
+                      endAge = newValues.end;
+                    });
                   }),
             ),
             Padding(
@@ -244,7 +291,17 @@ class _bottomSheetState extends State<bottomSheet> {
                   Padding(
                     padding: const EdgeInsets.only(left: 58.0, right: 48),
                     child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          List<Data> dummy_data = filterListBySearch(
+                            widget.data!,
+                            startAge!,
+                            endAge!,
+                            _selectedArea!,
+                            _selectedCategory!,
+                            selectedRs.text,
+                          );
+                          Navigator.pop(context, dummy_data);
+                        },
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(9)),
@@ -257,16 +314,29 @@ class _bottomSheetState extends State<bottomSheet> {
                         )),
                   ),
                   ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(9)),
-                          backgroundColor: Colors.white,
-                          minimumSize: Size(98, 40)),
-                      child: Text(
-                        'Reset',
-                        style: TextStyle(color: Colors.black),
-                      )),
+                    onPressed: () {
+                      // Clear all fields and reset state
+                      setState(() {
+                        _selectedCategory = null;
+                        _selectedArea = null;
+                        selectedRs.clear();
+                        startAge = 0.00;
+                        endAge = 10.00;
+                        values = RangeValues(0, 10);
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      backgroundColor: Colors.white,
+                      minimumSize: Size(98, 40),
+                    ),
+                    child: Text(
+                      'Reset',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
                 ],
               ),
             ) // Add other filter options similarly

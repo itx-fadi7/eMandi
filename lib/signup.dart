@@ -246,7 +246,7 @@ class _DashBoardState extends State<signUp> {
                                   },
                                   child: CircleAvatar(
                                     backgroundImage:
-                                        AssetImage('assets/images/google.png'),
+                                        AssetImage('assets/images/goo.png'),
                                     radius: 30,
                                     // Adjust the radius to increase the size
                                   ),

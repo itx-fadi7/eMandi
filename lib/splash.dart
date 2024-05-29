@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Text(
             'Welcome to eMandi',
             style: TextStyle(
-                color: Colors.green, fontWeight: FontWeight.bold, fontSize: 28),
+                color: Colors.teal, fontWeight: FontWeight.bold, fontSize: 28),
           )
         ],
       ),

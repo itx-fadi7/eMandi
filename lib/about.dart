@@ -12,7 +12,19 @@ class _aboutState extends State<about> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('eMandi App'),
+          iconTheme: IconThemeData(color: Colors.white),
+          title: Text(
+            'eMandi app',
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.teal,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+
+                  // bottomleft: Radius.circular(25),
+                  bottomRight: Radius.circular(21),
+                  bottomLeft: Radius.circular(21))),
         ),
         body: Padding(
           padding: const EdgeInsets.all(18.0),

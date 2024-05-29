@@ -4,6 +4,7 @@ import 'package:emandi/animaldetail.dart';
 import 'package:emandi/custombottomsheet.dart';
 import 'package:emandi/firebase_options.dart';
 import 'package:emandi/login.dart';
+import 'package:emandi/map.dart';
 import 'package:emandi/model.dart';
 import 'package:emandi/navbar.dart';
 import 'package:emandi/saler_dashboard.dart';
@@ -13,10 +14,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 // import 'package:practice/model.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = 'pk_test_51PHi05Rvwlv5GWNuqmQMGc6xfMOkC5JJ'
+      'AdeSzD9QPpDrt4TpxLNu02mq8pYjWBnkssdm2iuAuCyoZY5pWIFqcRUy00ktXNLffB';
   FirebaseApp app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -56,19 +60,33 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'eMandi',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        // iconTheme: IconThemeData(color: Colors.red),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: (FirebaseAuth.instance.currentUser != null)
-          ? MyHomePage(
-              email: FirebaseAuth.instance.currentUser?.email ?? '',
-            )
-          : SplashScreen(),
-    );
+        title: 'eMandi',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          // iconTheme: IconThemeData(color: Colors.red),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasError) {
+              return Text(snapshot.error.toString());
+            }
+            if (snapshot.connectionState == ConnectionState.active) {
+              if (snapshot.data == null) {
+                return SplashScreen();
+              } else {
+                return MyHomePage(
+                  email: FirebaseAuth.instance.currentUser?.email ?? '',
+                );
+              }
+            }
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ));
   }
 }
 
@@ -152,26 +170,23 @@ class _MyHomePageState extends State<MyHomePage> {
       print(_photo.length);
       filteredList = _photo;
     });
-
-    print('Seller: >>>>>>>>>>>>>>>>>>>> ');
-    // print(_dataList);
   }
 
-  String? _selectedCategory;
-  List<String> _categories = [
-    'All Category',
-    'Livestock',
-    'Hen/Aseel',
-    'Birds',
-  ];
-  String? _selectedArea;
-  List<String> _area = [
-    'All mandi',
-    'Gujranwala',
-    'Sialkot',
-    'Lalamusa',
-    'Gujrat',
-  ];
+  // String? _selectedCategory;
+  // List<String> _categories = [
+  //   'All Category',
+  //   'Livestock',
+  //   'Hen/Aseel',
+  //   'Birds',
+  // ];
+  // String? _selectedArea;
+  // List<String> _area = [
+  //   'All mandi',
+  //   'Gujranwala',
+  //   'Sialkot',
+  //   'Lalamusa',
+  //   'Gujrat',
+  // ];
 
   bool searching = false;
   TextEditingController searchController = TextEditingController();
@@ -189,6 +204,13 @@ class _MyHomePageState extends State<MyHomePage> {
     return originalList
         .where((data) =>
             data.category.toLowerCase() == targetCategory.toLowerCase())
+        .toList();
+  }
+
+  List<Data> filterListBySearch(List<Data> originalList, String targetTitle) {
+    return originalList
+        .where((data) =>
+            data.title.toLowerCase().contains(targetTitle.toLowerCase()))
         .toList();
   }
 
@@ -230,7 +252,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: TextField(
                       controller: searchController,
                       onChanged: (value) {
-                        setState(() {});
+                        setState(() {
+                          filteredList =
+                              filterListBySearch(filteredList, value);
+                        });
                       },
                       decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.search),
@@ -240,6 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               searching = false;
                               setState(() {});
                               searchController.clear();
+                              filteredList = _photo;
                             },
                           ),
                           hintText: 'Search...',
@@ -255,11 +281,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 size: 28,
                 // color: Colors.white,
               ),
-              onPressed: () {
-                showModalBottomSheet(
+              onPressed: () async {
+                setState(() {});
+                List<Data>? dummy_List = await showModalBottomSheet<List<Data>>(
                   context: context,
-                  builder: (context) => bottomSheet(),
+                  builder: (context) => bottomSheet(
+                    data: _photo,
+                  ),
                 );
+
+// Check if the result is not null
+                if (dummy_List != null) {
+                  setState(() {
+                    filteredList = dummy_List;
+                  });
+                }
               },
             )
           ],
@@ -344,7 +380,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   });
                                 }
                                 setState(() {
-                                  targetCategory = 'livestock';
+                                  targetCategory = 'Livestock';
                                   filteredList = filterListByCategory(
                                       filteredList, targetCategory);
                                 });
@@ -387,7 +423,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   });
                                 }
                                 setState(() {
-                                  targetCategory = 'hen';
+                                  targetCategory = 'Hen/Aseel';
                                   filteredList = filterListByCategory(
                                       filteredList, targetCategory);
                                 });
@@ -429,7 +465,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   });
                                 }
                                 setState(() {
-                                  targetCategory = 'bird';
+                                  targetCategory = 'Birds';
                                   filteredList = filterListByCategory(
                                       filteredList, targetCategory);
                                 });
@@ -461,110 +497,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: ElevatedButton.icon(
                         onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) => Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            targetLocation = 'Gujrat';
-                                            filteredList = filterListByLocation(
-                                                _photo, targetLocation);
-                                          });
-                                          Navigator.pop(context);
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.teal,
-                                            minimumSize: Size(250, 45)),
-                                        child: Text(
-                                          'GUJRAT',
-                                          style: TextStyle(color: Colors.white),
-                                        )),
-                                  ),
-                                  Container(height: 15),
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          targetLocation = 'Gujranwala';
-                                          filteredList = filterListByLocation(
-                                              _photo, targetLocation);
-                                        });
-                                        Navigator.pop(context);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.teal,
-                                          minimumSize: Size(250, 45)),
-                                      child: Text(
-                                        'GUJRANWALA',
-                                        style: TextStyle(color: Colors.white),
-                                      )),
-                                  Container(height: 15),
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          targetLocation = 'Sialkot';
-                                          filteredList = filterListByLocation(
-                                              _photo, targetLocation);
-                                        });
-                                        Navigator.pop(context);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.teal,
-                                          minimumSize: Size(250, 45)),
-                                      child: Text(
-                                        'SIALKOT',
-                                        style: TextStyle(color: Colors.white),
-                                      )),
-                                  Container(height: 15),
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          targetLocation = 'Lalamusa';
-                                          filteredList = filterListByLocation(
-                                              _photo, 'Lalamusa');
-                                        });
-                                        Navigator.pop(context);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.teal,
-                                        minimumSize: Size(250, 45),
-                                      ),
-                                      child: Text(
-                                        'LALAMUSA',
-                                        style: TextStyle(color: Colors.white),
-                                      )),
-                                  Container(height: 15),
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          // targetLocation = 'Lalamusa';
-                                          // if (targetLocation != '') {
-                                          //   filteredList = filterListByCategory(
-                                          //       _photo, targetCategory);
-                                          // } else {
-                                          filteredList = _photo;
-                                          targetLocation = '';
-                                          // }
-                                        });
-                                        Navigator.pop(context);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.teal,
-                                        minimumSize: Size(250, 45),
-                                      ),
-                                      child: Text(
-                                        'All mendi',
-                                        style: TextStyle(color: Colors.white),
-                                      )),
-                                ],
-                              ),
-                            ),
-                          );
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MapScreen(),
+                              ));
                         },
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -616,99 +553,91 @@ class _MyHomePageState extends State<MyHomePage> {
                           crossAxisSpacing: 5,
                           mainAxisExtent: 235),
                       itemBuilder: (context, index) {
-                        final title = filteredList[index].title.toLowerCase();
-                        if (title
-                            .contains(searchController.text.toLowerCase())) {
-                          return InkWell(
-                            onTap: () {
-                              print(filteredList[index].ownerPho);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        animalDetail(temp: filteredList[index]),
-                                  ));
-                            },
-                            child: Container(
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    height: 150.5,
-                                    decoration: BoxDecoration(
-                                      // color: Colors.amberAccent,
-                                      image: DecorationImage(
-                                        image: filteredList[index]
-                                                .image
-                                                .startsWith('https')
-                                            ? NetworkImage(
-                                                filteredList[index].image)
-                                            : AssetImage(
-                                                    filteredList[index].image)
-                                                as ImageProvider<Object>,
-                                        fit: BoxFit.contain,
-                                      ),
+                        return InkWell(
+                          onTap: () {
+                            print(filteredList[index].ownerPho);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      animalDetail(temp: filteredList[index]),
+                                ));
+                          },
+                          child: Container(
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  height: 150.5,
+                                  decoration: BoxDecoration(
+                                    // color: Colors.amberAccent,
+                                    image: DecorationImage(
+                                      image: filteredList[index]
+                                              .image
+                                              .startsWith('https')
+                                          ? NetworkImage(
+                                              filteredList[index].image)
+                                          : AssetImage(
+                                                  filteredList[index].image)
+                                              as ImageProvider<Object>,
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
-                                  Container(
-                                    height: 18,
-                                    child: Text(
-                                      filteredList[index].title,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15),
-                                    ),
+                                ),
+                                Container(
+                                  height: 18,
+                                  child: Text(
+                                    filteredList[index].title,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
                                   ),
-                                  Container(
-                                      height: 21,
-                                      child: filteredList[index].postedDate !=
-                                              ''
-                                          ? Text(
-                                              'Posted ${DateTime.now().difference(DateFormat('yyyy-MM-dd').parse(filteredList[index].postedDate)).inDays}d ago')
-                                          : Text('')),
-                                  Container(
-                                    height: 17,
-                                    child: Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 62.0, right: 6),
-                                          child: Text(
-                                            'Rs',
-                                            style: TextStyle(
-                                                color: Colors.green,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                        Text(
-                                          filteredList[index].Rs,
+                                ),
+                                Container(
+                                    height: 21,
+                                    child: filteredList[index].postedDate != ''
+                                        ? Text(
+                                            'Posted ${DateTime.now().difference(DateFormat('yyyy-MM-dd').parse(filteredList[index].postedDate)).inDays}d ago')
+                                        : Text('')),
+                                Container(
+                                  height: 17,
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 62.0, right: 6),
+                                        child: Text(
+                                          'Rs',
                                           style: TextStyle(
                                               color: Colors.green,
                                               fontWeight: FontWeight.bold),
                                         ),
+                                      ),
+                                      Text(
+                                        filteredList[index].Rs,
+                                        style: TextStyle(
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  height: 20,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 45.0),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.location_on),
+                                        Text(filteredList[index].location)
                                       ],
                                     ),
                                   ),
-                                  Container(
-                                    height: 20,
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 45.0),
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.location_on),
-                                          Text(filteredList[index].location)
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          );
-                        } else {
-                          return Container();
-                        }
+                          ),
+                        );
                       },
                     ),
                   ),

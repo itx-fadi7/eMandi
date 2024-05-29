@@ -203,26 +203,11 @@ class _loginPageState extends State<loginPage> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 28.0),
                                 child: InkWell(
-                                  onTap: () async {
-                                    var result = await signInWithGoogle();
-                                    if (result.user != null) {
-                                      print(
-                                          'LoginSuccess - name , email : ${result.user!.displayName!}, ${result.user!.email!} ');
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                        builder: (context) => MyHomePage(
-                                          email: emailText.text,
-                                        ),
-                                      ));
-                                    } else {
-                                      MyToast.myShowToast(
-                                          'Error While Login with Google!');
-                                    }
-                                  },
+                                  onTap: () => signInWithGoogle(context),
                                   child: CircleAvatar(
                                     backgroundImage:
-                                        AssetImage('assets/images/google.png'),
-                                    radius: 30,
+                                        AssetImage('assets/images/goo.png'),
+                                    radius: 27,
                                     // Adjust the radius to increase the size
                                   ),
                                 ),
@@ -278,21 +263,64 @@ class _loginPageState extends State<loginPage> {
     );
   }
 
-  Future<UserCredential> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+//   signInWithGoogle() async {
+//     // Trigger the authentication flow
+//     GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+//
+//     // Obtain the auth details from the request
+//     GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+//
+//     // Create a new credential
+//     AuthCredential credential = GoogleAuthProvider.credential(
+//       accessToken: googleAuth?.accessToken,
+//       idToken: googleAuth?.idToken,
+//     );
+//     UserCredential userCredential =
+//         await FirebaseAuth.instance.signInWithCredential(credential);
+//     print(userCredential.user?.displayName);
+//   }
+// }
 
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
+      if (googleUser != null) {
+        // Obtain the auth details from the request
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
 
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+        // Create a new credential
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        // Sign in to Firebase with the Google credentials
+        final UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithCredential(credential);
+
+        // Retrieve the user information
+        final User? user = userCredential.user;
+
+        if (user != null) {
+          print('User signed in: ${user.displayName}');
+          // Navigate to the next screen or perform any other actions upon successful sign-in
+        } else {
+          print('Failed to sign in with Google.');
+          // Handle sign-in failure
+        }
+      } else {
+        print('Google sign-in canceled.');
+        // Handle sign-in cancellation
+      }
+    } catch (e) {
+      print('Error signing in with Google: $e');
+      // Handle sign-in errors
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to sign in with Google. Please try again later.'),
+      ));
+    }
   }
 }
