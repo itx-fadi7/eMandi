@@ -25,34 +25,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-//For get data from database
-  // DocumentSnapshot snapshot = await FirebaseFirestore.instance
-  //     .collection('animals')
-  //     .doc("FwXAVc7BiDbtw4mfGkZ0")
-  //     .get();
-  // log(snapshot.data().toString());
 
-  //Update
-
-  // Map<String, dynamic> newUserData = {"name": "bird", "Beautiful Bird": "Parr"};
-  // await FirebaseFirestore.instance.collection("animals").add(newUserData);
-  // log('New User Saved');
-
-  //Update
-
-  // Map<String, dynamic> newUserData = {"name": "bird", "Beautiful": "Prr"};
-  // await FirebaseFirestore.instance
-  //     .collection("animals")
-  //     .doc('newUserData')
-  //     .update({"name": "birds"});
-  // log("Data Updated!");
-
-  //Delete
-
-  // await FirebaseFirestore.instance
-  //     .collection("animals")
-  //     .doc("0cBhnkDIL6m5gWcs1uns")
-  //     .delete();
   runApp(MyApp());
 }
 
@@ -60,33 +33,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'eMandi',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          // iconTheme: IconThemeData(color: Colors.red),
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasError) {
-              return Text(snapshot.error.toString());
-            }
-            if (snapshot.connectionState == ConnectionState.active) {
-              if (snapshot.data == null) {
-                return SplashScreen();
-              } else {
-                return MyHomePage(
-                  email: FirebaseAuth.instance.currentUser?.email ?? '',
-                );
-              }
-            }
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        ));
+      title: 'eMandi',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        // iconTheme: IconThemeData(color: Colors.red),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: (FirebaseAuth.instance.currentUser != null)
+          ? MyHomePage(
+              email: FirebaseAuth.instance.currentUser?.email ?? '',
+            )
+          : SplashScreen(),
+    );
   }
 }
 
@@ -496,12 +455,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          List<Data> dataList = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => MapScreen(),
                               ));
+                          if (dataList.isNotEmpty) {
+                            filteredList = dataList;
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(

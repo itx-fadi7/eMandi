@@ -27,10 +27,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -66,15 +63,29 @@ class DefaultFirebaseOptions {
     messagingSenderId: '938170352569',
     projectId: 'fmandi-a7e9b',
     storageBucket: 'fmandi-a7e9b.appspot.com',
+    androidClientId: '938170352569-4g9doclh7u8nvc209374m9sk2u09b5es.apps.googleusercontent.com',
+    iosClientId: '938170352569-8m77t2vgofp0lq84hmilq08nfcc1bujt.apps.googleusercontent.com',
     iosBundleId: 'com.example.emandi',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDVwinDI6XoYMY042ItSM-7u8z4f7hVoxc',
-    appId: '1:938170352569:ios:3e9c00bc4e59c44f6fec68',
+    appId: '1:938170352569:ios:b217c193419a0f136fec68',
     messagingSenderId: '938170352569',
     projectId: 'fmandi-a7e9b',
     storageBucket: 'fmandi-a7e9b.appspot.com',
-    iosBundleId: 'com.example.emandi.RunnerTests',
+    androidClientId: '938170352569-4g9doclh7u8nvc209374m9sk2u09b5es.apps.googleusercontent.com',
+    iosClientId: '938170352569-8m77t2vgofp0lq84hmilq08nfcc1bujt.apps.googleusercontent.com',
+    iosBundleId: 'com.example.emandi',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyC0aAMQc2yVuO6IRTdZHf1OcmsnimK-vLg',
+    appId: '1:938170352569:web:7cd815a7319af2066fec68',
+    messagingSenderId: '938170352569',
+    projectId: 'fmandi-a7e9b',
+    authDomain: 'fmandi-a7e9b.firebaseapp.com',
+    storageBucket: 'fmandi-a7e9b.appspot.com',
+  );
+
 }

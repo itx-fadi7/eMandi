@@ -253,7 +253,8 @@ class MapScreenState extends State<MapScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (city.name == 'Gujrat') {
+                    print(city.name);
+                    if (city.name == 'Gujrat Mandi') {
                       setState(() {
                         targetLocation = 'Gujrat';
                         filteredList =
@@ -261,15 +262,16 @@ class MapScreenState extends State<MapScreen> {
                         print('Filtering for Gujrat');
                       });
                       Navigator.pop(context);
-                    } else if (city.name == 'Gujranwala') {
+                    } else if (city.name == 'Gujranwala Mandi') {
                       setState(() {
                         targetLocation = 'Gujranwala';
                         filteredList =
                             filterListByLocation(_photo, targetLocation!);
+                        Navigator.pop(context, filteredList);
                         print('Filtering for GRW');
                       });
                       Navigator.pop(context);
-                    } else if (city.name == 'Sialkot') {
+                    } else if (city.name == 'Sialkot Mandi') {
                       setState(() {
                         targetLocation = 'Sialkot';
                         filteredList =
