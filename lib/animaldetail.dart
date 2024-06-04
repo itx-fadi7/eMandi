@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emandi/chatListScreen.dart';
+import 'package:emandi/chat_ui.dart';
 import 'package:emandi/forgotpass.dart';
 import 'package:emandi/model.dart';
 import 'package:emandi/splash.dart';
@@ -12,14 +15,15 @@ import 'package:http/http.dart' as http;
 
 class animalDetail extends StatefulWidget {
   Data temp;
-  animalDetail({super.key, required this.temp});
+  final String email;
+  animalDetail({super.key, required this.temp, required this.email});
   @override
   State<animalDetail> createState() => _animalDetailState();
 }
 
-class _animalDetailState extends State<animalDetail> {
-  Map<String, dynamic>? paymentIntentData;
+Map<String, dynamic>? paymentIntentData;
 
+class _animalDetailState extends State<animalDetail> {
   var _detail = Data(
       email: 'asif@gmail.com',
       image: 'assets/images/cow.png',
@@ -64,11 +68,14 @@ class _animalDetailState extends State<animalDetail> {
     );
   }
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirestoreService _firestoreService = FirestoreService();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     setState(() {
+      print(widget.email);
       _detail = widget.temp;
       whatsapp = Uri.parse('http://wa.me/'
           '${widget.temp.ownerPho.startsWith('0') ? '+'
@@ -179,29 +186,54 @@ class _animalDetailState extends State<animalDetail> {
                           ],
                         ),
                       ),
-                      Container(
-                          padding: const EdgeInsets.only(left: 90.0, right: 8),
-                          child: InkWell(
-                            onTap: () {
-                              launchUrl(whatsapp);
-                            },
-                            child: Image.asset(
-                              'assets/images/whatsapp.png',
-                              width: 40,
-                              height: 40,
-                            ),
-                          )),
-                      Container(
-                        child: IconButton(
-                            onPressed: () => launch(
-                                "tel://${widget.temp.ownerPho.startsWith('0') ? '+92${widget.temp.ownerPho.substring(1)}' : widget.temp.ownerPho}"),
-                            icon: Icon(Icons.call)),
-                        // decoration: BoxDecoration(
-                        //     border: Border(
-                        //         top: BorderSide(width: 2.0),
-                        //         bottom: BorderSide(width: 2.0),
-                        //         left: BorderSide(width: 2.0),
-                        //         right: BorderSide(width: 2.0))),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 88.0, top: 03),
+                        child: Container(
+                          child: IconButton(
+                              onPressed: () async {
+                                String? buyerId = await _firestoreService
+                                    .getBuyerIdByEmail(widget.email);
+                                if (buyerId != null) {
+                                  String sellerId = _auth.currentUser!.uid;
+                                  String chatRoomId =
+                                      generateChatId(sellerId, buyerId);
+                                  String chatId =
+                                      generateChatId(sellerId, buyerId);
+                                  // Add the new chat room to Firestore
+                                  await FirebaseFirestore.instance
+                                      .collection('chatRooms')
+                                      .doc(chatRoomId)
+                                      .set({
+                                    'users': [sellerId, buyerId],
+                                    'created_at': FieldValue.serverTimestamp(),
+                                  });
+
+                                  // Update the user's chatRooms list
+                                  await _firestoreService.addChatRoomToUser(
+                                      sellerId, chatRoomId);
+
+                                  if (mounted) {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      builder: (context) => ChatRoom(
+                                          sellerId: sellerId,
+                                          buyerId: buyerId,
+                                          chatId: chatId),
+                                    )); // Refresh the screen to show updated chat rooms
+                                  }
+                                } else {
+                                  // Handle error when buyer email is not found
+                                  MyToast.myShowToast('Buyer email not found');
+                                }
+                              },
+                              icon: Icon(Icons.chat)),
+                          // decoration: BoxDecoration(
+                          //     border: Border(
+                          //         top: BorderSide(width: 2.0),
+                          //         bottom: BorderSide(width: 2.0),
+                          //         left: BorderSide(width: 2.0),
+                          //         right: BorderSide(width: 2.0))),
+                        ),
                       ),
                     ],
                   ),
@@ -400,14 +432,8 @@ class _animalDetailState extends State<animalDetail> {
                           children: [
                             Text(
                               _detail.ownerName,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                _detail.ownerPho,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           ],
                         ),
@@ -492,7 +518,7 @@ class _animalDetailState extends State<animalDetail> {
 // }
   Future<void> makePayment() async {
     try {
-      paymentIntentData = await createPaymentIntent(_detail.Rs, "USD");
+      paymentIntentData = await createPaymentIntent(_detail.Rs, "PKR");
       if (paymentIntentData != null &&
           paymentIntentData!['client_secret'] != null) {
         await Stripe.instance.initPaymentSheet(
@@ -556,5 +582,11 @@ class _animalDetailState extends State<animalDetail> {
     String amountWithoutCommas = amount.replaceAll(',', '');
     final price = int.parse(amountWithoutCommas) * 100;
     return price.toString();
+  }
+
+  String generateChatId(String userId1, String userId2) {
+    return userId1.compareTo(userId2) < 0
+        ? '$userId1$userId2'
+        : '$userId2$userId1';
   }
 }

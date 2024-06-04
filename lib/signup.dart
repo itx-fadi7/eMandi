@@ -6,6 +6,7 @@ import 'package:emandi/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class signUp extends StatefulWidget {
   @override
@@ -16,7 +17,8 @@ class _DashBoardState extends State<signUp> {
   TextEditingController emailText = TextEditingController();
   TextEditingController passText = TextEditingController();
   TextEditingController cpassText = TextEditingController();
-
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
   void creatAcount() async {
     String email = emailText.text.trim();
     String password = passText.text.trim();
@@ -32,6 +34,12 @@ class _DashBoardState extends State<signUp> {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
         if (userCredential != null) {
+          await _firestore
+              .collection('users')
+              .doc(userCredential.user!.uid)
+              .set({
+            'email': email,
+          });
           FirebaseAuth.instance.currentUser!.sendEmailVerification();
           Navigator.popUntil(context, (route) => route.isFirst);
           Navigator.pushReplacement(

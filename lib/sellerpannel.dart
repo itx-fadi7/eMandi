@@ -832,105 +832,130 @@ class _MyHomePageState extends State<seller> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_title.text.isEmpty ||
-                        _location.isEmpty ||
-                        _price.text.isEmpty ||
-                        // _keywords.text.isEmpty ||
-                        _category.isEmpty ||
-                        _quantity.text.isEmpty ||
-                        _age.text.isEmpty ||
-                        // _description.text.isEmpty ||
-                        _ownerName.text.isEmpty ||
-                        _ownerPho.text.isEmpty) {
-                      // Show error messages and highlight empty fields in red
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Please fill in all fields.'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      // Highlight empty fields in red
-                      setState(() {
-                        _titleError = _title.text.isEmpty;
-                        _locationError = _location.isEmpty;
-                        _priceError = _price.text.isEmpty;
-                        // _keywordsError = _keywords.text.isEmpty;
-                        _categoryError = _category.isEmpty;
-                        _quantityError = _quantity.text.isEmpty;
-                        _ageError = _age.text.isEmpty;
-                        // _descriptionError = _description.text.isEmpty;
-                        _ownerNameError = _ownerName.text.isEmpty;
-                        _ownerPhoError = _ownerPho.text.isEmpty;
-                      });
-                    } else {
-                      // All fields are filled, proceed with saving data
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 18.0, bottom: 18, top: 18, left: 44),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_title.text.isEmpty ||
+                            _location.isEmpty ||
+                            _price.text.isEmpty ||
+                            // _keywords.text.isEmpty ||
+                            _category.isEmpty ||
+                            _quantity.text.isEmpty ||
+                            _age.text.isEmpty ||
+                            // _description.text.isEmpty ||
+                            _ownerName.text.isEmpty ||
+                            _ownerPho.text.isEmpty) {
+                          // Show error messages and highlight empty fields in red
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Please fill in all fields.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          // Highlight empty fields in red
+                          setState(() {
+                            _titleError = _title.text.isEmpty;
+                            _locationError = _location.isEmpty;
+                            _priceError = _price.text.isEmpty;
+                            // _keywordsError = _keywords.text.isEmpty;
+                            _categoryError = _category.isEmpty;
+                            _quantityError = _quantity.text.isEmpty;
+                            _ageError = _age.text.isEmpty;
+                            // _descriptionError = _description.text.isEmpty;
+                            _ownerNameError = _ownerName.text.isEmpty;
+                            _ownerPhoError = _ownerPho.text.isEmpty;
+                          });
+                        } else {
+                          // All fields are filled, proceed with saving data
 
-                      String imglink = widget
-                          .dummy_image; // Initialize imglink with the dummy image
-                      if (widget.flag == 'edit') {
-                        // Check if profilePic is not null and update imglink if needed
-                        if (profilePic != null) {
-                          UploadTask uploadTask = FirebaseStorage.instance
-                              .ref()
-                              .child("profilePicture")
-                              .child(Uuid().v1())
-                              .putFile(profilePic!);
-                          TaskSnapshot taskSnapshot = await uploadTask;
-                          String downloadUrl =
-                              await taskSnapshot.ref.getDownloadURL();
-                          if (downloadUrl.isNotEmpty) {
-                            imglink =
-                                downloadUrl; // Update imglink with the downloadUrl
-                            print(downloadUrl);
+                          String imglink = widget
+                              .dummy_image; // Initialize imglink with the dummy image
+                          if (widget.flag == 'edit') {
+                            // Check if profilePic is not null and update imglink if needed
+                            if (profilePic != null) {
+                              UploadTask uploadTask = FirebaseStorage.instance
+                                  .ref()
+                                  .child("profilePicture")
+                                  .child(Uuid().v1())
+                                  .putFile(profilePic!);
+                              TaskSnapshot taskSnapshot = await uploadTask;
+                              String downloadUrl =
+                                  await taskSnapshot.ref.getDownloadURL();
+                              if (downloadUrl.isNotEmpty) {
+                                imglink =
+                                    downloadUrl; // Update imglink with the downloadUrl
+                                print(downloadUrl);
+                              }
+                            }
+                          } else {
+                            saveData();
                           }
-                        }
-                      } else {
-                        saveData();
-                      }
 
-                      // Update the data sent back via Navigator.pop with the correct image link
-                      Navigator.pop(
-                        context,
-                        Data(
-                          email: widget.email,
-                          views: "0",
-                          image: imglink,
-                          id: widget
-                              .dummy_id, // Assuming dummy_id is the ID field you want to pass back
-                          postedDate: DateFormat('yyyy-MM-dd')
-                              .format(DateTime.now())
-                              .toString(),
-                          title: _title.text,
-                          location: _location,
-                          Rs: _price.text,
-                          key: _keywords.text,
-                          category: _category,
-                          animalQuantity: _quantity.text,
-                          age: _age.text + _selectedUnit,
-                          description: _description.text,
-                          ownerName: _ownerName.text,
-                          ownerPho: _ownerPho.text,
+                          // Update the data sent back via Navigator.pop with the correct image link
+                          Navigator.pop(
+                            context,
+                            Data(
+                              email: widget.email,
+                              views: "0",
+                              image: imglink,
+                              id: widget
+                                  .dummy_id, // Assuming dummy_id is the ID field you want to pass back
+                              postedDate: DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.now())
+                                  .toString(),
+                              title: _title.text,
+                              location: _location,
+                              Rs: _price.text,
+                              key: _keywords.text,
+                              category: _category,
+                              animalQuantity: _quantity.text,
+                              age: _age.text + _selectedUnit,
+                              description: _description.text,
+                              ownerName: _ownerName.text,
+                              ownerPho: _ownerPho.text,
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        minimumSize: Size(120, 40),
+                      ),
+                      child: Text(
+                        'Submit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    minimumSize: Size(180, 40),
-                  ),
-                  child: Text(
-                    'Submit',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        minimumSize: Size(120, 40),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

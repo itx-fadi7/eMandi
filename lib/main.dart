@@ -456,13 +456,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: ElevatedButton.icon(
                         onPressed: () async {
-                          List<Data> dataList = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MapScreen(),
-                              ));
-                          if (dataList.isNotEmpty) {
-                            filteredList = dataList;
+                          List<Data>? dataList = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapScreen(photo: _photo),
+                            ),
+                          );
+
+                          if (dataList != null && dataList.isNotEmpty) {
+                            print(dataList[0]);
+                            setState(() {
+                              filteredList = dataList;
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -521,8 +526,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      animalDetail(temp: filteredList[index]),
+                                  builder: (context) => animalDetail(
+                                    temp: filteredList[index],
+                                    email: widget.email ?? '',
+                                  ),
                                 ));
                           },
                           child: Container(

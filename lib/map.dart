@@ -16,8 +16,8 @@ class City {
 }
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
-
+  MapScreen({Key? key, required this.photo}) : super(key: key);
+  List<Data> photo;
   @override
   State<MapScreen> createState() => MapScreenState();
 }
@@ -73,6 +73,9 @@ class MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      _photo = widget.photo;
+    });
     _getCurrentLocation();
   }
 
@@ -138,14 +141,38 @@ class MapScreenState extends State<MapScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Nearest Mandi'),
+          backgroundColor: Colors.white,
+          title: Text(
+            'Nearest Mandi',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Name: ${nearestCity?.name ?? 'Unknown'}'),
-              Text('Province: ${nearestCity?.province ?? 'Unknown'}'),
-              Text('Distance: ${(minDistance / 1000).toStringAsFixed(2)} km'),
+              Text(
+                'Name: ${nearestCity?.name ?? 'Unknown'}',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'Province: ${nearestCity?.province ?? 'Unknown'}',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'Distance: ${(minDistance / 1000).toStringAsFixed(2)} km',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           actions: [
@@ -154,14 +181,36 @@ class MapScreenState extends State<MapScreen> {
                 Navigator.pop(context); // Close dialog
                 _drawPolylineToCity(nearestCity!); // Start navigation
               },
-              child: Text('Start Directions'),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  minimumSize: Size(195, 40),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18))),
+              child: Text(
+                'Start Directions',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context); // Close dialog
                 // Implement logic to select another marker
               },
-              child: Text('Select Another Mandi'),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  minimumSize: Size(175, 40),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18))),
+              child: Text(
+                'Select Another Mandi',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -225,9 +274,27 @@ class MapScreenState extends State<MapScreen> {
           children: [
             Text('City: ${city.name}',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text('Province: ${city.province}'),
-            Text('Distance: ${(distance / 1000).toStringAsFixed(2)} km'),
-            Text('Estimated Time: ${travelTime.toStringAsFixed(2)} hours'),
+            Text(
+              'Province: ${city.province}',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            Text(
+              'Distance: ${(distance / 1000).toStringAsFixed(2)} km',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            Text(
+              'Estimated Time: ${travelTime.toStringAsFixed(2)} hours',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
             SizedBox(height: 16),
             Column(
               children: [
@@ -239,7 +306,18 @@ class MapScreenState extends State<MapScreen> {
                         Navigator.pop(context);
                         _drawPolylineToCity(city);
                       },
-                      child: Text('Direction'),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          minimumSize: Size(100, 40),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18))),
+                      child: Text(
+                        'Direction',
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -247,7 +325,18 @@ class MapScreenState extends State<MapScreen> {
                         // Implement start navigation logic here
                         _startNavigation(city);
                       },
-                      child: Text('Start'),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          minimumSize: Size(100, 40),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18))),
+                      child: Text(
+                        'Start',
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
                     ),
                   ],
                 ),
@@ -259,37 +348,47 @@ class MapScreenState extends State<MapScreen> {
                         targetLocation = 'Gujrat';
                         filteredList =
                             filterListByLocation(_photo, targetLocation!);
-                        print('Filtering for Gujrat');
+                        Navigator.pop(context, filteredList);
                       });
-                      Navigator.pop(context);
+                      Navigator.pop(context, filteredList);
                     } else if (city.name == 'Gujranwala Mandi') {
                       setState(() {
                         targetLocation = 'Gujranwala';
                         filteredList =
                             filterListByLocation(_photo, targetLocation!);
                         Navigator.pop(context, filteredList);
-                        print('Filtering for GRW');
                       });
-                      Navigator.pop(context);
+                      Navigator.pop(context, filteredList);
                     } else if (city.name == 'Sialkot Mandi') {
                       setState(() {
                         targetLocation = 'Sialkot';
                         filteredList =
                             filterListByLocation(_photo, targetLocation!);
-                        print('Filtering for SIA');
+                        Navigator.pop(context, filteredList);
                       });
-                      Navigator.pop(context);
+                      Navigator.pop(context, filteredList);
                     } else {
                       setState(() {
                         targetLocation = 'Lalamusa';
                         filteredList =
                             filterListByLocation(_photo, 'Lalamusa'!);
-                        print('Filtering for Lala');
+                        Navigator.pop(context, filteredList);
                       });
-                      Navigator.pop(context);
+                      Navigator.pop(context, filteredList);
                     }
                   },
-                  child: Text('View ${city.name} Listing'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      minimumSize: Size(175, 40),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18))),
+                  child: Text(
+                    'View ${city.name} Listing',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -353,7 +452,19 @@ class MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Google Maps Example'),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          'eMandi app',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.teal,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+
+                // bottomleft: Radius.circular(25),
+                bottomRight: Radius.circular(21),
+                bottomLeft: Radius.circular(21))),
       ),
       body: Stack(
         children: [

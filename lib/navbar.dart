@@ -1,4 +1,5 @@
 import 'package:emandi/about.dart';
+import 'package:emandi/chatListScreen.dart';
 import 'package:emandi/main.dart';
 import 'package:emandi/polices.dart';
 import 'package:emandi/splash.dart';
@@ -70,8 +71,14 @@ class _NavBarState extends State<navBar> {
           ),
           ListTile(
             leading: Icon(Icons.notifications),
-            title: Text('Request'),
-            onTap: () => null,
+            title: Text('Chat'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatListScreen(),
+                  ));
+            },
             trailing: Container(
               color: Colors.red,
               width: 20,
@@ -89,8 +96,8 @@ class _NavBarState extends State<navBar> {
             leading: Icon(Icons.description),
             title: Text('Policies'),
             onTap: () {
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => polices()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => policies()));
             },
           ),
           Divider(),
